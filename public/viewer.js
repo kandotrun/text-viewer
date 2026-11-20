@@ -2,8 +2,10 @@ let editor = document.querySelector('#text');
 
 // Focus before the browser handles the shortcut so paste and Undo stay native.
 document.addEventListener('keydown', (event) => {
-  if (event.target === editor || event.defaultPrevented) return;
-  if ((event.metaKey || event.ctrlKey) && !event.altKey && event.key.toLowerCase() === 'v') {
+  if (event.target === editor || event.defaultPrevented || event.altKey) return;
+  const pasteShortcut = (event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'v';
+  const insertShortcut = event.shiftKey && event.key === 'Insert' && !event.ctrlKey && !event.metaKey;
+  if (pasteShortcut || insertShortcut) {
     editor.focus({ preventScroll: true });
   }
 });

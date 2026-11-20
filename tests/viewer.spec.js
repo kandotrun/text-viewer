@@ -55,6 +55,12 @@ test('pastes from the page, opens at the top, and supports native Undo and typin
   await expect.poll(() => input.evaluate(element => element.scrollTop)).toBe(0);
   await page.keyboard.insertText('追記');
   await expect(input).toHaveValue(`${source}追記`);
+
+  await input.press('ControlOrMeta+A');
+  await input.press('Backspace');
+  await input.blur();
+  await page.keyboard.press('Shift+Insert');
+  await expect(input).toHaveValue(source);
 });
 
 test('forgets edits in a new tab, after reload and after history traversal', async ({ page, context, browserName }) => {
