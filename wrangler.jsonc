@@ -1,0 +1,8 @@
+{
+  "name": "text-viewer",
+  "compatibility_date": "2026-11-20",
+  "workers_dev": false,
+  "preview_urls": false,
+  "assets": { "directory": "./public" },
+  "routes": [{ "pattern": "viewer.2-38.com", "custom_domain": true }]
+}
