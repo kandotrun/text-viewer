@@ -16,35 +16,28 @@ body {
   margin: 0;
 }
 
-main {
-  --page-inset: clamp(1.25rem, 5vw, 3rem);
-  box-sizing: border-box;
-  max-inline-size: 36em;
-  max-inline-size: 36ic;
-  margin-inline: auto;
-  padding: var(--page-inset);
-  font-size: 1.625rem;
-  line-height: 1.8;
-  letter-spacing: .02em;
-}
-
-[hidden] {
-  display: none;
-}
-
 textarea {
+  --page-inset: clamp(1.25rem, 5vw, 3rem);
   display: block;
   box-sizing: border-box;
   inline-size: 100%;
-  block-size: calc(100svh - 2 * var(--page-inset));
-  padding: 0;
+  block-size: 100vh;
+  block-size: 100svh;
+  padding-block: var(--page-inset);
+  padding-inline: max(var(--page-inset), calc((100% - 36em) / 2 + var(--page-inset)));
+  padding-inline: max(var(--page-inset), calc((100% - 36ic) / 2 + var(--page-inset)));
   border: 0;
   outline: 0;
   resize: none;
   background: transparent;
   color: inherit;
   font: inherit;
-  letter-spacing: inherit;
+  font-size: 1.625rem;
+  line-height: 1.8;
+  letter-spacing: .02em;
+  line-break: strict;
+  overflow-wrap: anywhere;
+  tab-size: 4;
 }
 
 textarea::placeholder {
@@ -58,12 +51,4 @@ textarea::placeholder {
 
 textarea:focus-visible::placeholder {
   color: currentColor;
-}
-
-article {
-  outline: 0;
-  white-space: pre-wrap;
-  overflow-wrap: anywhere;
-  line-break: strict;
-  tab-size: 4;
 }

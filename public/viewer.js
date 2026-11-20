@@ -1,27 +1,25 @@
-const input = document.querySelector('#text');
-const reading = document.querySelector('#reading');
+let editor = document.querySelector('#text');
 
-function clearText() {
-  input.value = '';
-  input.hidden = false;
-  reading.textContent = '';
-  reading.hidden = true;
-}
-
-document.addEventListener('paste', (event) => {
-  const text = event.clipboardData?.getData('text/plain');
-  if (!text || event.defaultPrevented) return;
-
-  event.preventDefault();
-  input.value = '';
-  input.hidden = true;
-  reading.textContent = text;
-  reading.hidden = false;
-  reading.focus({ preventScroll: true });
-  window.scrollTo(0, 0);
+// Focus before the browser handles the shortcut so paste and Undo stay native.
+document.addEventListener('keydown', (event) => {
+  if (event.target === editor || event.defaultPrevented) return;
+  if ((event.metaKey || event.ctrlKey) && !event.altKey && event.key.toLowerCase() === 'v') {
+    editor.focus({ preventScroll: true });
+  }
 });
 
-// Discard text before a browser can restore the page from its history cache.
-window.addEventListener('pagehide', clearText);
-window.addEventListener('pageshow', clearText);
-clearText();
+document.addEventListener('paste', (event) => {
+  const input = editor;
+  if (event.target !== input || input.value !== '' || event.defaultPrevented) return;
+  requestAnimationFrame(() => { input.scrollTop = 0; });
+});
+
+// Drop the native undo history as well as the value before history caching.
+window.addEventListener('pagehide', () => {
+  editor.value = '';
+  const blankEditor = editor.cloneNode();
+  editor.replaceWith(blankEditor);
+  editor = blankEditor;
+});
+window.addEventListener('pageshow', () => { editor.value = ''; });
+editor.value = '';
