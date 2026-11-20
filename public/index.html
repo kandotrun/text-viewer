@@ -12,6 +12,11 @@
   <body>
     <main>
       <textarea id="text" aria-label="文章" placeholder="ここに入力・貼り付け" dir="auto" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>
+      <div class="share" id="share" hidden>
+        <input id="share-link" aria-label="共有リンク" type="text" readonly hidden>
+        <span id="share-status" role="status"></span>
+        <button id="copy-link" type="button">リンクをコピー</button>
+      </div>
     </main>
   </body>
 </html>
