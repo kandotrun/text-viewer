@@ -18,7 +18,7 @@ module.exports = defineConfig({
     { name: 'webkit', use: { browserName: 'webkit' } },
   ],
   webServer: testURL ? undefined : {
-    command: 'python3 -m http.server 18784 --bind 127.0.0.1 --directory public',
+    command: 'npm exec --no -- wrangler dev --local --ip 127.0.0.1 --port 18784',
     url: localURL,
     reuseExistingServer: !process.env.CI,
   },

@@ -3,8 +3,20 @@ const share = document.querySelector('#share');
 const shareLink = document.querySelector('#share-link');
 const shareStatus = document.querySelector('#share-status');
 const copyLink = document.querySelector('#copy-link');
-const sharePrefix = '#v1=';
+const sharePrefix = '#s1=';
+const legacySharePrefix = '#v1=';
 let revision = 0;
+let shareRequest;
+
+function invalidateShare() {
+  shareRequest?.abort();
+  shareRequest = undefined;
+  return ++revision;
+}
+
+function prefixFor(hash) {
+  return [sharePrefix, legacySharePrefix].find(prefix => hash.startsWith(prefix));
+}
 
 function updateShare(message = '', url = '') {
   copyLink.hidden = editor.value === '';
@@ -14,11 +26,11 @@ function updateShare(message = '', url = '') {
   share.hidden = copyLink.hidden && !message;
 }
 
-async function createShareLink(text) {
-  const { encodeSharedText } = await import('./share-codec.js');
+async function createShareLink(text, signal) {
+  const { createShortShare } = await import('./share-codec.js');
   const url = new URL(location.href);
   url.search = '';
-  url.hash = sharePrefix + await encodeSharedText(text);
+  url.hash = sharePrefix + await createShortShare(text, signal);
   return url.href;
 }
 
@@ -42,16 +54,18 @@ async function copyToClipboard(url, attempt) {
 copyLink.addEventListener('click', async () => {
   if (copyLink.disabled) return;
   copyLink.disabled = true;
-  const attempt = ++revision;
-  const url = createShareLink(editor.value);
+  const attempt = invalidateShare();
+  const request = new AbortController();
+  shareRequest = request;
+  const url = createShareLink(editor.value, request.signal);
   const writing = copyToClipboard(url, attempt);
   try {
     const [link, copied] = await Promise.all([url, writing]);
     if (attempt !== revision) return;
     if (copied) {
-      updateShare('リンクをコピーしました');
+      updateShare('リンクをコピーしました（7日間有効）');
     } else {
-      updateShare('共有リンクを選択してコピーしてください', link);
+      updateShare('共有リンクを選択してコピーしてください（7日間有効）', link);
       shareLink.focus();
       shareLink.select();
     }
@@ -62,34 +76,48 @@ copyLink.addEventListener('click', async () => {
       : '共有リンクを作れませんでした');
   } finally {
     await writing;
+    if (shareRequest === request) shareRequest = undefined;
     copyLink.disabled = false;
   }
 });
 
 async function openShareLink() {
-  const attempt = ++revision;
+  const attempt = invalidateShare();
   const hash = location.hash;
-  if (!hash.startsWith(sharePrefix)) return;
+  const prefix = prefixFor(hash);
+  if (!prefix) return;
+
+  const request = new AbortController();
+  shareRequest = request;
+  let codec;
 
   try {
     const address = new URL(location.href);
     address.hash = '';
     history.replaceState({ consumedShare: attempt }, '', address);
-    const { decodeSharedText } = await import('./share-codec.js');
-    const text = await decodeSharedText(hash.slice(sharePrefix.length));
+    codec = await import('./share-codec.js');
+    const payload = hash.slice(prefix.length);
+    const text = prefix === sharePrefix
+      ? await codec.openShortShare(payload, request.signal)
+      : await codec.decodeSharedText(payload);
     if (attempt !== revision) return;
     editor.value = text;
     editor.setSelectionRange(0, 0);
     editor.scrollTop = 0;
     updateShare();
-  } catch {
-    if (attempt === revision) updateShare('共有リンクを開けませんでした');
+  } catch (error) {
+    if (attempt !== revision) return;
+    updateShare(codec && error instanceof codec.ShareNotFoundError
+      ? '共有リンクの有効期限が切れたか、見つかりません'
+      : '共有リンクを開けませんでした');
+  } finally {
+    if (shareRequest === request) shareRequest = undefined;
   }
 }
 
 document.addEventListener('input', (event) => {
   if (event.target !== editor) return;
-  revision++;
+  invalidateShare();
   updateShare();
 });
 
@@ -111,7 +139,7 @@ document.addEventListener('paste', (event) => {
 
 // Drop the textarea's native undo history as well as the value.
 function clearEditor() {
-  revision++;
+  invalidateShare();
   editor.value = '';
   const blankEditor = editor.cloneNode();
   editor.replaceWith(blankEditor);
@@ -121,7 +149,7 @@ function clearEditor() {
 
 window.addEventListener('pagehide', clearEditor);
 window.addEventListener('popstate', () => {
-  if (!location.hash.startsWith(sharePrefix)) clearEditor();
+  if (!prefixFor(location.hash)) clearEditor();
 });
 window.addEventListener('pageshow', () => {
   editor.value = '';
