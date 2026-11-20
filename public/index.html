@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="light dark">
+    <meta name="description" content="貼り付けた文章を大きな文字で読むビューア。">
+    <title>読むだけ</title>
+    <link rel="stylesheet" href="./viewer.css">
+    <script src="./viewer.js" defer></script>
+  </head>
+  <body>
+    <main>
+      <textarea id="text" aria-label="貼り付ける文章" placeholder="ここに貼り付け" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>
+      <article id="reading" dir="auto" tabindex="-1" hidden></article>
+    </main>
+  </body>
+</html>

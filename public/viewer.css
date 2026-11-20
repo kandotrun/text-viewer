@@ -1,0 +1,69 @@
+:root {
+  color-scheme: light dark;
+  background: #fcfcfb;
+  color: #202226;
+  font-family: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic Medium", "Yu Gothic", Meiryo, system-ui, sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    background: #141619;
+    color: #eff0f2;
+  }
+}
+
+body {
+  margin: 0;
+}
+
+main {
+  --page-inset: clamp(1.25rem, 5vw, 3rem);
+  box-sizing: border-box;
+  max-inline-size: 36em;
+  max-inline-size: 36ic;
+  margin-inline: auto;
+  padding: var(--page-inset);
+  font-size: 1.625rem;
+  line-height: 1.8;
+  letter-spacing: .02em;
+}
+
+[hidden] {
+  display: none;
+}
+
+textarea {
+  display: block;
+  box-sizing: border-box;
+  inline-size: 100%;
+  block-size: calc(100svh - 2 * var(--page-inset));
+  padding: 0;
+  border: 0;
+  outline: 0;
+  resize: none;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  letter-spacing: inherit;
+}
+
+textarea::placeholder {
+  color: #686c74;
+  opacity: 1;
+}
+
+@media (prefers-color-scheme: dark) {
+  textarea::placeholder { color: #a7aab1; }
+}
+
+textarea:focus-visible::placeholder {
+  color: currentColor;
+}
+
+article {
+  outline: 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  line-break: strict;
+  tab-size: 4;
+}
