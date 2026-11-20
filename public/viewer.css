@@ -16,13 +16,19 @@ body {
   margin: 0;
 }
 
-textarea {
+main {
   --page-inset: clamp(1.25rem, 5vw, 3rem);
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  block-size: 100vh;
+  block-size: 100svh;
+}
+
+textarea {
   display: block;
   box-sizing: border-box;
   inline-size: 100%;
-  block-size: 100vh;
-  block-size: 100svh;
+  block-size: 100%;
   padding-block: var(--page-inset);
   padding-inline: max(var(--page-inset), calc((100% - 36em) / 2 + var(--page-inset)));
   padding-inline: max(var(--page-inset), calc((100% - 36ic) / 2 + var(--page-inset)));
@@ -52,3 +58,26 @@ textarea::placeholder {
 textarea:focus-visible::placeholder {
   color: currentColor;
 }
+
+.share:not([hidden]) {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  align-items: center;
+  gap: .5rem .75rem;
+  padding: 0 var(--page-inset) max(.75rem, env(safe-area-inset-bottom));
+  font-size: .875rem;
+}
+
+.share button, .share input {
+  min-block-size: 2.75rem;
+  padding: .375rem .625rem;
+  border: 1px solid #81858a;
+  border-radius: .375rem;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+}
+
+.share button { cursor: pointer; }
+.share input { box-sizing: border-box; flex: 1 1 16rem; min-inline-size: 0; }
