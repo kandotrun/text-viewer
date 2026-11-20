@@ -1,8 +1,18 @@
 {
   "name": "text-viewer",
+  "main": "src/worker.js",
   "compatibility_date": "2026-11-20",
   "workers_dev": false,
   "preview_urls": false,
-  "assets": { "directory": "./public" },
+  "assets": {
+    "directory": "./public",
+    "binding": "ASSETS",
+    "run_worker_first": ["/api/*"]
+  },
+  "durable_objects": {
+    "bindings": [{ "name": "SHARES", "class_name": "ShortShare" }]
+  },
+  "migrations": [{ "tag": "short-shares-v1", "new_sqlite_classes": ["ShortShare"] }],
+  "ratelimits": [{ "name": "SHARE_RATE_LIMIT", "namespace_id": "735142304", "simple": { "limit": 30, "period": 60 } }],
   "routes": [{ "pattern": "viewer.2-38.com", "custom_domain": true }]
 }
